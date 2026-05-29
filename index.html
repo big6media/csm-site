@@ -1,0 +1,484 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centerbase Renewal Calculator</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 24px;
+    background: #f7f7f5;
+    color: #37352f;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: #1a1a1a;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: #787774;
+    margin: 0 0 24px 0;
+  }
+  .card {
+    background: #ffffff;
+    border: 1px solid #e9e9e7;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #787774;
+    margin: 0 0 16px 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 18px;
+  }
+  .field { display: flex; flex-direction: column; }
+  .field label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #37352f;
+    margin-bottom: 6px;
+  }
+  .field input,
+  .field select {
+    padding: 9px 11px;
+    border: 1px solid #e9e9e7;
+    border-radius: 6px;
+    font-size: 15px;
+    background: #fff;
+    color: #1a1a1a;
+    font-family: inherit;
+    transition: border-color 0.12s, box-shadow 0.12s;
+  }
+  .field input:focus,
+  .field select:focus {
+    outline: none;
+    border-color: #2383e2;
+    box-shadow: 0 0 0 2px rgba(35,131,226,0.2);
+  }
+  .helper {
+    font-size: 12px;
+    color: #9b9a97;
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .badge-standard { background: #dbeddb; color: #2b593f; }
+  .badge-discount { background: #fbe4cc; color: #8b4513; }
+  .reasons {
+    font-size: 13px;
+    color: #4b4b48;
+    margin-top: 10px;
+    line-height: 1.55;
+  }
+  .reasons ul { margin: 4px 0 0 0; padding-left: 18px; }
+  .reasons li { margin-bottom: 2px; }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f1ef;
+    font-size: 14px;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .lbl { color: #4b4b48; }
+  .summary-row .val {
+    font-weight: 600;
+    color: #1a1a1a;
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+  }
+  .delta-positive { color: #2b593f; }
+  .delta-negative { color: #b13c3c; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4px;
+  }
+  th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #787774;
+    padding: 10px 8px;
+    border-bottom: 1px solid #e9e9e7;
+  }
+  th.num, td.num { text-align: right; }
+  td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #f1f1ef;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.year-cell {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  .pct-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #f1f1ef;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b4b48;
+  }
+  .tcv-card {
+    background: linear-gradient(135deg, #f7f7f5 0%, #ffffff 100%);
+    border: 1px solid #e9e9e7;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .tcv-card .lbl {
+    font-size: 13px;
+    color: #4b4b48;
+    font-weight: 500;
+  }
+  .tcv-card .val {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    font-variant-numeric: tabular-nums;
+  }
+  .notes {
+    font-size: 12px;
+    color: #9b9a97;
+    margin-top: 16px;
+    line-height: 1.55;
+    padding: 12px 14px;
+    background: #f7f7f5;
+    border-radius: 6px;
+    border-left: 3px solid #d3d2cf;
+  }
+  .notes strong { color: #4b4b48; }
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    body { padding: 16px; }
+    .card { padding: 16px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Renewal Pricing Calculator</h1>
+  <p class="subtitle">Two-band, linear-on-base math. Mirrors the standard finance playbook.</p>
+
+  <div class="card">
+    <p class="card-title">Inputs</p>
+    <div class="grid">
+      <div class="field">
+        <label for="currentPrice">Current price per user (monthly)</label>
+        <input type="number" id="currentPrice" value="89" min="0" step="0.01" />
+        <div class="helper">Essentials list: $99/mo · Premium list: $139/mo</div>
+      </div>
+
+      <div class="field">
+        <label for="tier">Tier (for list-price comparison)</label>
+        <select id="tier">
+          <option value="99">Essentials ($99/mo)</option>
+          <option value="139">Premium ($139/mo)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="currentUsers">Current number of users</label>
+        <input type="number" id="currentUsers" value="10" min="0" step="1" />
+      </div>
+
+      <div class="field">
+        <label for="newUsers">New number of total users</label>
+        <input type="number" id="newUsers" value="10" min="0" step="1" />
+      </div>
+
+      <div class="field">
+        <label for="term">Renewal term</label>
+        <select id="term">
+          <option value="3" selected>3 Year</option>
+          <option value="2">2 Year</option>
+          <option value="1">1 Year</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="bandOverride">Band</label>
+        <select id="bandOverride">
+          <option value="auto" selected>Auto-detect</option>
+          <option value="standard">Force Standard</option>
+          <option value="discount">Force Discount</option>
+        </select>
+        <div class="helper">Auto applies the playbook rules</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Band</p>
+    <div id="bandBadge"></div>
+    <div class="reasons" id="bandReasons"></div>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Current vs. New Base</p>
+    <div class="summary-row">
+      <span class="lbl">Current ACV</span>
+      <span class="val" id="currentACV">—</span>
+    </div>
+    <div class="summary-row">
+      <span class="lbl">New base ACV <span style="color:#9b9a97; font-weight:400;">(new users × current per-seat × 12)</span></span>
+      <span class="val" id="newBaseACV">—</span>
+    </div>
+    <div class="summary-row">
+      <span class="lbl">Effective rate vs. list</span>
+      <span class="val" id="rateVsList">—</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Year-by-Year Breakdown</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Uplift</th>
+          <th class="num">$/user/mo</th>
+          <th class="num">Annual ACV</th>
+          <th class="num">Δ vs. current</th>
+        </tr>
+      </thead>
+      <tbody id="yearRows"></tbody>
+    </table>
+
+    <div class="tcv-card">
+      <span class="lbl">Total Contract Value</span>
+      <span class="val" id="tcv">—</span>
+    </div>
+
+    <div class="notes" id="mathNote"></div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  // ---- Math model (mirrors scripts/calc_options.py — linear on base) ----
+  const BANDS = {
+    standard: {
+      label: "Standard (no reduction, customer at/near list)",
+      uplifts: { 1: [0.05], 2: [0.03, 0.03], 3: [0.03, 0.03, 0.03] }
+    },
+    discount: {
+      label: "Discount (>10% under list OR reducing licenses)",
+      uplifts: { 1: [0.07], 2: [0.05, 0.05], 3: [0.05, 0.05, 0.05] }
+    }
+  };
+
+  // Per-seat caps by tier list price (Essentials $99 → $109 cap; Premium $139 → $149 cap)
+  const CAPS = { 99: 109, 139: 149 };
+
+  // Distribute `totalPct` whole percentage points across `years` years, front-loaded
+  // Each year = ceil(remaining / yearsLeft). Matches the 5%→2/2/1 example.
+  function frontLoadedSplit(totalPct, years) {
+    const result = [];
+    let remaining = totalPct;
+    for (let i = 0; i < years; i++) {
+      const yearsLeft = years - i;
+      const thisYear = yearsLeft > 0 ? Math.ceil(remaining / yearsLeft) : 0;
+      result.push(thisYear);
+      remaining -= thisYear;
+    }
+    return result;
+  }
+
+  // Returns the effective per-year uplifts after cap consideration
+  function computeUplifts(band, term, currentPrice, listPrice) {
+    const playbook = BANDS[band].uplifts[term]; // e.g., [0.03, 0.03, 0.03]
+    const playbookTotalPct = Math.round(playbook.reduce((a, b) => a + b, 0) * 100);
+
+    const cap = CAPS[listPrice];
+    if (!cap || currentPrice <= 0) {
+      return { uplifts: playbook, capped: false, playbookTotalPct, cap };
+    }
+
+    // Max whole-percent total uplift that keeps final-year price ≤ cap
+    const rawMax = ((cap / currentPrice) - 1) * 100;
+    const maxAllowedTotalPct = Math.max(0, Math.floor(rawMax));
+
+    if (maxAllowedTotalPct >= playbookTotalPct) {
+      return { uplifts: playbook, capped: false, playbookTotalPct, cap, maxAllowedTotalPct };
+    }
+
+    // Cap kicks in — front-load the allowed total across the term
+    const split = frontLoadedSplit(maxAllowedTotalPct, term);
+    return {
+      uplifts: split.map(p => p / 100),
+      capped: true,
+      playbookTotalPct,
+      cap,
+      maxAllowedTotalPct,
+      originalPlaybook: playbook
+    };
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const fmt$ = (n) => '$' + Math.round(n).toLocaleString('en-US');
+  const fmt$2 = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtPct = (n, withSign = true) => (withSign && n >= 0 ? '+' : '') + n.toFixed(1) + '%';
+
+  function detectBand(currentPrice, listPrice, currentUsers, newUsers) {
+    const underListPct = ((listPrice - currentPrice) / listPrice) * 100;
+    const reducing = newUsers < currentUsers;
+    const reasons = [];
+
+    if (underListPct > 10) reasons.push(`Current price is ${underListPct.toFixed(1)}% under list ($${listPrice}/mo) — exceeds the 10% threshold`);
+    if (reducing) reasons.push(`Reducing from ${currentUsers} to ${newUsers} licenses`);
+
+    if (underListPct > 10 || reducing) {
+      return { band: 'discount', reasons };
+    }
+
+    // Standard reasons
+    if (underListPct >= 0) {
+      reasons.push(`Current price is ${underListPct.toFixed(1)}% under list ($${listPrice}/mo) — within 10% threshold`);
+    } else {
+      reasons.push(`Current price is ${Math.abs(underListPct).toFixed(1)}% above list ($${listPrice}/mo)`);
+    }
+    if (!reducing) reasons.push(`No license reduction (${currentUsers} → ${newUsers})`);
+    return { band: 'standard', reasons };
+  }
+
+  function recalc() {
+    const currentPrice = parseFloat($('currentPrice').value) || 0;
+    const listPrice = parseFloat($('tier').value);
+    const currentUsers = parseInt($('currentUsers').value) || 0;
+    const newUsers = parseInt($('newUsers').value) || 0;
+    const term = parseInt($('term').value);
+    const bandChoice = $('bandOverride').value;
+
+    // Detect or override band
+    const detection = detectBand(currentPrice, listPrice, currentUsers, newUsers);
+    const band = bandChoice === 'auto' ? detection.band : bandChoice;
+    const upliftResult = computeUplifts(band, term, currentPrice, listPrice);
+    const uplifts = upliftResult.uplifts;
+
+    // Band badge
+    const badgeClass = band === 'standard' ? 'badge-standard' : 'badge-discount';
+    const badgeText = band === 'standard' ? 'STANDARD' : 'DISCOUNT';
+    let badgeHtml = `<span class="badge ${badgeClass}">${badgeText}</span>`;
+    if (bandChoice !== 'auto') {
+      badgeHtml += ` <span style="font-size:12px; color:#9b9a97; margin-left:8px;">(manual override — auto-detect says ${detection.band})</span>`;
+    }
+    $('bandBadge').innerHTML = badgeHtml;
+
+    const reasonsToShow = bandChoice === 'auto' ? detection.reasons : detection.reasons;
+    $('bandReasons').innerHTML = reasonsToShow.length
+      ? `<ul>${reasonsToShow.map(r => `<li>${r}</li>`).join('')}</ul>`
+      : '';
+
+    // Current vs new base
+    const currentACV = currentPrice * 12 * currentUsers;
+    const newBaseACV = currentPrice * 12 * newUsers; // base = new seats × current rate
+    const underListPct = ((listPrice - currentPrice) / listPrice) * 100;
+
+    $('currentACV').textContent = fmt$(currentACV) + ` (${currentUsers} × ${fmt$2(currentPrice)} × 12)`;
+    $('newBaseACV').textContent = fmt$(newBaseACV) + ` (${newUsers} × ${fmt$2(currentPrice)} × 12)`;
+    $('rateVsList').innerHTML = underListPct >= 0
+      ? `<span>${underListPct.toFixed(1)}% under list</span>`
+      : `<span>${Math.abs(underListPct).toFixed(1)}% above list</span>`;
+
+    // Year rows — LINEAR ON BASE
+    // Y_n ACV = newBaseACV × (1 + cumulative_uplift_n)
+    // cumulative_uplift_n = sum(uplifts[0..n])
+    let cum = 0;
+    let tcv = 0;
+    const rows = uplifts.map((u, i) => {
+      cum += u;
+      const yACV = newBaseACV * (1 + cum);
+      const yPerSeat = newBaseACV > 0 ? (yACV / newUsers / 12) : 0;
+      const delta = yACV - currentACV;
+      const deltaPct = currentACV > 0 ? (delta / currentACV) * 100 : 0;
+      tcv += yACV;
+      const deltaClass = delta >= 0 ? 'delta-positive' : 'delta-negative';
+      const cumPct = Math.round(cum * 100);
+      return `
+        <tr>
+          <td class="year-cell">Year ${i + 1}</td>
+          <td><span class="pct-pill">+${Math.round(u * 100)}% (cum +${cumPct}%)</span></td>
+          <td class="num">${fmt$2(yPerSeat)}</td>
+          <td class="num">${fmt$(yACV)}</td>
+          <td class="num ${deltaClass}">${delta >= 0 ? '+' : ''}${fmt$(delta)} (${fmtPct(deltaPct)})</td>
+        </tr>`;
+    }).join('');
+    $('yearRows').innerHTML = rows;
+
+    $('tcv').textContent = fmt$(tcv);
+
+    // Math note (cap-aware)
+    const uplistList = uplifts.map(u => Math.round(u * 100) + '%').join(' / ');
+    const cumList = uplifts.map((_, i) => {
+      const c = uplifts.slice(0, i + 1).reduce((a, b) => a + b, 0);
+      return '+' + Math.round(c * 100) + '%';
+    }).join(', ');
+
+    let noteHtml = '';
+    if (upliftResult.capped) {
+      const tierName = listPrice === 99 ? 'Essentials' : 'Premium';
+      const origList = upliftResult.originalPlaybook.map(u => Math.round(u * 100) + '%').join('/');
+      noteHtml =
+        `<strong>⚠ Cap applied:</strong> ${tierName} per-seat cap is $${upliftResult.cap}/mo. ` +
+        `Standard ${term}yr ${band} pattern would be <code>${origList}</code> (cum +${upliftResult.playbookTotalPct}%), ` +
+        `but at $${currentPrice.toFixed(2)}/mo current that would push per-seat above the cap. ` +
+        `Max allowed total uplift = <strong>${upliftResult.maxAllowedTotalPct}%</strong>, ` +
+        `front-loaded across ${term}yr as <code>${uplistList}</code>.<br><br>` +
+        `<strong>Math:</strong> Each year = <code>new_base × (1 + cumulative uplift)</code>, linear-on-base. ` +
+        `Cumulative ${cumList}. New base = <strong>${fmt$(newBaseACV)}</strong>.`;
+    } else {
+      noteHtml =
+        `<strong>Math:</strong> Linear-on-base, each year is <code>new_base × (1 + cumulative uplift)</code>, not compounding. ` +
+        `${term}yr ${band} pattern is <code>${uplistList}</code> on base → cumulative ${cumList}. ` +
+        `New base = new users × current per-seat × 12 = <strong>${fmt$(newBaseACV)}</strong>.`;
+    }
+    $('mathNote').innerHTML = noteHtml;
+  }
+
+  ['currentPrice', 'tier', 'currentUsers', 'newUsers', 'term', 'bandOverride'].forEach(id => {
+    $(id).addEventListener('input', recalc);
+    $(id).addEventListener('change', recalc);
+  });
+
+  recalc();
+})();
+</script>
+</body>
+</html>
